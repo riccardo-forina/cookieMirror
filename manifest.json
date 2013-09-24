@@ -1,0 +1,20 @@
+{
+  "manifest_version": 2,
+
+  "name": "Cookie Mirror",
+  "description": "Add master-slave mirroring of cookies between two domains.",
+  "version": "1.0",
+
+  "permissions": [
+    "storage",
+    "cookies",
+    "http://*/*",
+    "https://*/*"
+  ],
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "options_page": "options.html"
+}

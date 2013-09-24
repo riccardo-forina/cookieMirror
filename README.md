@@ -1,0 +1,1 @@
+A Chrome extension to add master-slave mirroring of cookies between two domains.
