@@ -1,0 +1,43 @@
+<!doctype html>
+<html ng-app="CookieMirrorApp" ng-csp="">
+<head>
+  <meta charset="utf-8">
+  <title>Cookie Mirror</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/popup.css">
+</head>
+<body>
+
+  <div ng-controller="CurrentWebsiteCtrl">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>{{ master }}</th>
+          <th>{{ slave }}</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="(name, value) in cookies">
+          <td>{{ name }}</td>
+          <td>{{ value.master }}</td>
+          <td>{{ value.slave }}</td>
+          <td>
+            <i ng-show="value.master == value.slave" class="glyphicon glyphicon-ok"></i>
+            <i ng-show="value.master != value.slave" class="glyphicon glyphicon-warning-sign"></i>
+          </td>
+        </tr>
+        <tr ng-show="cookies.length == 0">
+          <td colspan="4">No cookies</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <script src="js/angular.min.js"></script>
+  <script src="js/chrome-extension.js"></script>
+  <script src="js/popup.js"></script>
+</body>
+</html>
+

@@ -13,8 +13,12 @@
   ],
   "background": {
     "scripts": [
-      "background.js"
+      "worker/background.js"
     ]
   },
-  "options_page": "options.html"
+  "options_page": "options/index.html",
+  "browser_action": {
+    "default_icon": "cookie.png"
+    // "default_popup": "popup/index.html"
+  }
 }

@@ -54,4 +54,8 @@
     }
   });
 
+  chrome.browserAction.onClicked.addListener(function(tab) {
+    chrome.windows.create({ url: 'popup/index.html', type: 'panel' });
+  });
+
 })(chrome);
