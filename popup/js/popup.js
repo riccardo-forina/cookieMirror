@@ -4,8 +4,9 @@
   angular.module('CookieMirrorApp', ['ng', 'ce'])
 
     .controller('CurrentWebsiteCtrl', [
-      '$scope', '$q', 'ceStorage', 'ceCookies',
-      function($scope, $q, ceStorage, ceCookies) {
+      '$scope', '$q', 'ceStorage', 'ceCookies', 'test',
+      function($scope, $q, ceStorage, ceCookies, test) {
+        $scope.wtf = test;
         $q.all([
           ceStorage,
           ceCookies

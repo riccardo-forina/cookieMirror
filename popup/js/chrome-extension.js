@@ -48,7 +48,9 @@
           sync('local');
           sync('sync');
           defer.resolve(storage);
-          $rootScope.$apply();
+          if (!$rootScope.$$phase) {
+            $rootScope.$apply();
+          }
         }
 
         // chrome.storage.onChanged.addListener(function(changed, areaName) {
@@ -76,7 +78,9 @@
               cookies[cookie.domain] = val;
             });
             defer.resolve(cookies);
-            $rootScope.$apply();
+            if (!$rootScope.$$phase) {
+              $rootScope.$apply();
+            }
           });
         }
 
@@ -86,6 +90,18 @@
         sync();
 
         return defer.promise;
+      }
+    ])
+
+    .service('test', [
+      '$rootScope', '$browser',
+      function($rootScope, $browser) {
+        var that = this;
+        that.test = 1;
+        $browser.addPollFn(function() {
+          that.test += 1;
+          $rootScope.$apply();
+        });
       }
     ])
 
