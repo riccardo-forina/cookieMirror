@@ -28,80 +28,81 @@
 
   angular.module('ce-storage', ['ng'])
 
-    .factory('ceStorage', [
-      '$rootScope', '$browser', '$q',
-      function($rootScope, $browser, $q) {
-        var defer = $q.defer();
+    .service('ceStorage', [
+      '$rootScope', '$browser', '$log',
+      function($rootScope, $browser, $log) {
+        var self = this;
 
-        var storage = {
-          local: {},
-          sync: {}
-        };
+        self.local = {};
+        self.sync = {};
+
         function sync(what) {
           chrome.storage[what].get(null, function(items) {
-            storage[what] = items;
-            // $rootScope.$apply();
+            self[what] = items;
           });
         }
 
         function syncAll() {
           sync('local');
           sync('sync');
-          defer.resolve(storage);
           if (!$rootScope.$$phase) {
+            // $log.log('$apply');
             $rootScope.$apply();
           }
         }
 
-        // chrome.storage.onChanged.addListener(function(changed, areaName) {
-        //   sync(areaName);
-        // });
-        // $browser.addPollFn(syncAll);
-
+        chrome.storage.onChanged.addListener(function(changed, areaName) {
+          sync(areaName);
+        });
         syncAll();
-
-        return defer.promise;
+        // $browser.addPollFn(syncAll);
       }
     ])
 
-    .factory('ceCookies', [
-      '$rootScope', '$browser', '$q',
-      function($rootScope, $browser, $q) {
-        var defer = $q.defer();
+    .service('ceCookies', [
+      '$rootScope', '$browser', '$log',
+      function($rootScope, $browser, $log) {
+        var self = this;
+
+        self.cookies = {};
+
+        function setCookie(cookie) {
+          var val = self.cookies[cookie.domain] || {};
+          val[cookie.name] = cookie;
+          self.cookies[cookie.domain] = val;
+        }
+
+        function deleteCookie(cookie) {
+          var val = self.cookies[cookie.domain] || {};
+          delete val[cookie.name];
+          self.cookies[cookie.domain] = val;
+        }
 
         function sync() {
-          chrome.cookies.getAll({}, function(data) {
-            var cookies = {};
-            data.forEach(function(cookie) {
-              var val = cookies[cookie.domain] || {};
-              val[cookie.name] = cookie;
-              cookies[cookie.domain] = val;
-            });
-            defer.resolve(cookies);
+          chrome.cookies.getAll({}, function(cookies) {
+            self.cookies = {};
+            cookies.forEach(setCookie);
             if (!$rootScope.$$phase) {
+              // $log.log('$apply');
               $rootScope.$apply();
             }
           });
         }
 
-        // chrome.cookies.onChanged.addListener(sync);
-        // $browser.addPollFn(sync);
-
-        sync();
-
-        return defer.promise;
-      }
-    ])
-
-    .service('test', [
-      '$rootScope', '$browser',
-      function($rootScope, $browser) {
-        var that = this;
-        that.test = 1;
-        $browser.addPollFn(function() {
-          that.test += 1;
-          $rootScope.$apply();
+        chrome.cookies.onChanged.addListener(function(info) {
+          $log.info((info.removed ? 'Removed' : 'Changed [' + info.cause + ']') + ' cookie ' + info.cookie.domain + ':' + info.cookie.name);
+          if (info.removed) {
+            deleteCookie(info.cookie);
+          } else {
+            setCookie(info.cookie);
+          }
+          if (!$rootScope.$$phase) {
+            // $log.log('$apply');
+            $rootScope.$apply();
+          }
         });
+        // $browser.addPollFn(sync);
+        sync();
       }
     ])
 
